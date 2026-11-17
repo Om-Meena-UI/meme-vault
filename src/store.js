@@ -7,8 +7,9 @@ localforage.config({
   storeName: 'media_collection',
 });
 
-const ITEMS_KEY = 'vault_items';
 const COLLECTIONS_KEY = 'vault_collections';
+const USERS_KEY = 'vault_users';
+const CURRENT_USER_KEY = 'vault_current_user';
 
 // Media store for blobs
 const mediaStore = localforage.createInstance({
@@ -16,39 +17,141 @@ const mediaStore = localforage.createInstance({
   storeName: 'media_blobs',
 });
 
-export async function getAllItems() {
-  const items = await localforage.getItem(ITEMS_KEY);
+// Helper for user-scoped item key
+function getItemsKey(userId) {
+  return userId ? `vault_items_${userId}` : 'vault_items_guest';
+}
+
+/* ================= AUTHENTICATION & USERS ================= */
+
+export async function getCurrentUser() {
+  const user = await localforage.getItem(CURRENT_USER_KEY);
+  return user || null;
+}
+
+export async function getUsers() {
+  const users = await localforage.getItem(USERS_KEY);
+  return users || [];
+}
+
+export async function signUp({ name, email, password, avatar }) {
+  const users = await getUsers();
+  const existing = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+  if (existing) {
+    throw new Error('An account with this email already exists.');
+  }
+
+  const newUser = {
+    id: uuidv4(),
+    name: name.trim() || 'Vault Explorer',
+    email: email.trim().toLowerCase(),
+    password, // Stored locally in IndexedDB
+    avatar: avatar || '😎',
+    joinedAt: Date.now(),
+    lastSyncedAt: Date.now(),
+  };
+
+  users.push(newUser);
+  await localforage.setItem(USERS_KEY, users);
+  await localforage.setItem(CURRENT_USER_KEY, newUser);
+
+  // Migrate any guest items into the new user's vault if available
+  const guestItems = await localforage.getItem('vault_items_guest');
+  if (guestItems && guestItems.length > 0) {
+    await localforage.setItem(getItemsKey(newUser.id), guestItems);
+  }
+
+  return newUser;
+}
+
+export async function signIn({ email, password }) {
+  const users = await getUsers();
+  const user = users.find(
+    u => u.email.toLowerCase() === email.trim().toLowerCase() && u.password === password
+  );
+  if (!user) {
+    throw new Error('Invalid email or password.');
+  }
+
+  user.lastSyncedAt = Date.now();
+  await localforage.setItem(CURRENT_USER_KEY, user);
+  return user;
+}
+
+export async function signOut() {
+  await localforage.removeItem(CURRENT_USER_KEY);
+  return null;
+}
+
+export async function updateProfile(updates) {
+  const current = await getCurrentUser();
+  if (!current) return null;
+
+  const updated = { ...current, ...updates };
+  await localforage.setItem(CURRENT_USER_KEY, updated);
+
+  const users = await getUsers();
+  const idx = users.findIndex(u => u.id === current.id);
+  if (idx !== -1) {
+    users[idx] = updated;
+    await localforage.setItem(USERS_KEY, users);
+  }
+
+  return updated;
+}
+
+export async function syncToCloud(userId) {
+  // Simulates cloud sync ping and persists timestamp
+  await new Promise(r => setTimeout(r, 600));
+  const current = await getCurrentUser();
+  if (current) {
+    current.lastSyncedAt = Date.now();
+    await localforage.setItem(CURRENT_USER_KEY, current);
+    return current;
+  }
+  return null;
+}
+
+/* ================= MEDIA ITEMS ================= */
+
+export async function getAllItems(userId = null) {
+  const key = getItemsKey(userId);
+  const items = await localforage.getItem(key);
   return items || [];
 }
 
-export async function saveItem(item) {
-  const items = await getAllItems();
+export async function saveItem(item, userId = null) {
+  const key = getItemsKey(userId);
+  const items = await getAllItems(userId);
   const newItem = {
     id: uuidv4(),
     ...item,
     createdAt: Date.now(),
     favorite: false,
+    ownerId: userId || 'guest',
   };
   items.unshift(newItem);
-  await localforage.setItem(ITEMS_KEY, items);
+  await localforage.setItem(key, items);
   return newItem;
 }
 
-export async function updateItem(id, updates) {
-  const items = await getAllItems();
+export async function updateItem(id, updates, userId = null) {
+  const key = getItemsKey(userId);
+  const items = await getAllItems(userId);
   const idx = items.findIndex(i => i.id === id);
   if (idx !== -1) {
     items[idx] = { ...items[idx], ...updates };
-    await localforage.setItem(ITEMS_KEY, items);
+    await localforage.setItem(key, items);
     return items[idx];
   }
   return null;
 }
 
-export async function deleteItem(id) {
-  let items = await getAllItems();
+export async function deleteItem(id, userId = null) {
+  const key = getItemsKey(userId);
+  let items = await getAllItems(userId);
   items = items.filter(i => i.id !== id);
-  await localforage.setItem(ITEMS_KEY, items);
+  await localforage.setItem(key, items);
   await mediaStore.removeItem(id);
 }
 
@@ -69,18 +172,6 @@ export async function getAllCollections() {
     { id: 'reels', name: 'Reels', icon: '🎬' },
     { id: 'favorites', name: 'Favorites', icon: '⭐' },
   ];
-}
-
-export async function saveCollection(collection) {
-  const collections = await getAllCollections();
-  const newCollection = {
-    id: uuidv4(),
-    ...collection,
-    createdAt: Date.now(),
-  };
-  collections.push(newCollection);
-  await localforage.setItem(COLLECTIONS_KEY, collections);
-  return newCollection;
 }
 
 // Generate thumbnail/preview from file

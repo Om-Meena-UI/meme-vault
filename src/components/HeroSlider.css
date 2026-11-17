@@ -1,0 +1,351 @@
+.hero-slider {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.hero-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.hero-bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: brightness(0.6);
+}
+
+.hero-bg-gradient {
+  width: 100%;
+  height: 100%;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.hero-overlay-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(10, 10, 15, 0.9) 0%,
+    rgba(10, 10, 15, 0.5) 40%,
+    rgba(10, 10, 15, 0.2) 60%,
+    rgba(10, 10, 15, 0.4) 100%
+  );
+}
+
+.hero-accent-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), transparent 70%);
+  z-index: 10;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  height: 100%;
+  padding: 0 60px;
+  gap: 40px;
+}
+
+.hero-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 550px;
+}
+
+.hero-info {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.hero-category {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 500;
+}
+
+.hero-category-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.hero-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(40px, 5vw, 72px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -1px;
+  text-transform: uppercase;
+  color: white;
+  text-shadow: 0 2px 40px rgba(0, 0, 0, 0.5);
+}
+
+.hero-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.hero-tag {
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.hero-date {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.hero-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  color: var(--text-primary);
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  backdrop-filter: blur(10px);
+}
+
+.hero-action-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+}
+
+.hero-action-btn.primary {
+  background: rgba(245, 166, 35, 0.2);
+  border-color: rgba(245, 166, 35, 0.3);
+  color: var(--accent);
+}
+
+.hero-action-btn.primary:hover {
+  background: rgba(245, 166, 35, 0.3);
+}
+
+.hero-action-btn.favorited {
+  background: rgba(255, 107, 107, 0.15);
+  border-color: rgba(255, 107, 107, 0.3);
+  color: #ff6b6b;
+}
+
+.hero-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 1;
+  padding-right: 20px;
+}
+
+.hero-cards {
+  display: flex;
+  gap: 16px;
+  perspective: 1000px;
+}
+
+.hero-card {
+  width: 180px;
+  height: 260px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  transition: transform 0.3s;
+}
+
+.hero-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-card-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-card-emoji {
+  font-size: 48px;
+}
+
+.hero-card-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 12px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hero-card-type {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-secondary);
+}
+
+.hero-card-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1.2;
+  color: white;
+}
+
+/* Bottom controls */
+.hero-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 60px;
+  z-index: 10;
+}
+
+.hero-nav-arrows {
+  display: flex;
+  gap: 8px;
+}
+
+.hero-nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+  backdrop-filter: blur(10px);
+  font-size: 18px;
+}
+
+.hero-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.hero-progress-container {
+  flex: 1;
+  max-width: 300px;
+  margin: 0 24px;
+}
+
+.hero-progress-bar {
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.hero-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+.hero-counter {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.hero-counter-current {
+  color: var(--text-primary);
+}
+
+.hero-counter-sep {
+  color: var(--text-muted);
+  font-size: 16px;
+}
+
+.hero-counter-total {
+  color: var(--text-muted);
+  font-size: 16px;
+}
+
+/* Empty state */
+.hero-empty {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: 8px;
+}
+
+.hero-empty h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.hero-empty p {
+  color: var(--text-secondary);
+  font-size: 15px;
+}
